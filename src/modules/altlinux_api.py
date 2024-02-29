@@ -9,7 +9,7 @@ class AltLinuxAPI:
 
     async def export_branch_binary_packages(
         self, branch_name_1: str, branch_name_2: str
-    ):
+    ) -> dict:
         """Получить данные из указанных веток
 
         Args:
