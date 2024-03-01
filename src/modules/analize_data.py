@@ -1,5 +1,6 @@
 import pandas as pd
 from modules.other.version_compare import _compare_rpm_labels
+import json
 
 
 class AnalayzData:
@@ -29,7 +30,8 @@ class AnalayzData:
 
     def version_release_check(self, first_df, second_df):
         """Получить пакеты, где версии в first_df больше second_df"""
-        new_version = {}
+        new_versions = []  # список для хранения строк, удовлетворяющих условию
+
         unique_architectures = first_df["arch"].unique()
 
         for arch in unique_architectures:
@@ -51,8 +53,12 @@ class AnalayzData:
                     (epoch1, version1, release1), (epoch2, version2, release2)
                 )
                 if comparison_result == 1:
-                    new_version[arch] = row
-        return new_version
+                    new_versions.append(
+                        row.to_dict()
+                    )  # Преобразуем строку в словарь и добавляем в список
+
+        unique_df = pd.DataFrame(new_versions)  # Создаем DataFrame из списка словарей
+        return unique_df
 
 
 class ShowData:
@@ -62,9 +68,10 @@ class ShowData:
         self.json_data = {}
 
     def uniq_to_json(self, first_branch, second_branch, branch_name, branch_name_user):
+        """Генерация json для уникальных данных"""
         unique_first_branch_list = []
         grouped = first_branch.groupby("arch")
-        for name, group in grouped:
+        for name_arch, group in grouped:
             pkg_list = []
             for index, row in group.iterrows():
                 pkg_info = {
@@ -76,14 +83,44 @@ class ShowData:
                     "branch": branch_name_user,
                 }
                 pkg_list.append(pkg_info)
-            unique_first_branch_list.append({"arch": name, "pkg": pkg_list})
+            unique_first_branch_list.append({"arch": name_arch, "pkg": pkg_list})
         self.json_data[branch_name] = unique_first_branch_list
 
-    def show(self, first_branch, second_branch):
+    def newer_version_to_json(self, df_version):
+        unique_first_branch_list = []
+        grouped = df_version.groupby("arch_df1")
+        for arch_name, group in grouped:
+            pkg_list = []
+            for index, row in group.iterrows():
+                pkg_info = {
+                    "newer_version": {
+                        "name": row["name"],
+                        "version": row["version_df1"],
+                        "epoch": row["epoch_df1"],
+                        "release": row["release_df1"],
+                        "arch": row["arch_df1"],
+                        "branch": self.first_branch_name,
+                    },
+                    "older_version": {
+                        "name": row["name"],
+                        "version": row["version_df2"],
+                        "epoch": row["epoch_df2"],
+                        "release": row["release_df2"],
+                        "arch": row["arch_df1"],
+                        "branch": self.second_branch_name,
+                    },
+                }
+                pkg_list.append(pkg_info)
+            unique_first_branch_list.append({"arch": arch_name, "pkg": pkg_list})
+        self.json_data["version_newer"] = unique_first_branch_list
+
+    def show(self, first_branch, second_branch, version_data_df):
+        """Переводит датафрейм в json и отдает"""
         self.uniq_to_json(
             first_branch, second_branch, "unique_first_branch", self.first_branch_name
         )
         self.uniq_to_json(
             second_branch, first_branch, "unique_second_branch", self.second_branch_name
         )
-        return self.json_data
+        self.newer_version_to_json(version_data_df)
+        return json.dumps(self.json_data)
