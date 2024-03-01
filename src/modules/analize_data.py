@@ -93,20 +93,18 @@ class ShowData:
             pkg_list = []
             for index, row in group.iterrows():
                 pkg_info = {
+                    "name": row["name"],
+                    "arch": row["arch_df1"],
                     "newer_version": {
-                        "name": row["name"],
                         "version": row["version_df1"],
                         "epoch": row["epoch_df1"],
                         "release": row["release_df1"],
-                        "arch": row["arch_df1"],
                         "branch": self.first_branch_name,
                     },
                     "older_version": {
-                        "name": row["name"],
                         "version": row["version_df2"],
                         "epoch": row["epoch_df2"],
                         "release": row["release_df2"],
-                        "arch": row["arch_df1"],
                         "branch": self.second_branch_name,
                     },
                 }
@@ -123,4 +121,4 @@ class ShowData:
             second_branch, first_branch, "unique_second_branch", self.second_branch_name
         )
         self.newer_version_to_json(version_data_df)
-        return json.dumps(self.json_data)
+        return json.dumps(self.json_data, indent=4)

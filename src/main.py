@@ -2,7 +2,6 @@ import sys
 from modules.altlinux_api import AltLinuxAPI
 import asyncio
 from modules.analize_data import AnalayzData, ShowData
-from pprint import pprint
 from modules.logger import logger
 
 
@@ -36,7 +35,7 @@ async def main(branch_name_1, branch_name_2, save_on_file):
         with open(save_on_file, "w") as f:
             f.write(data)
     else:
-        pprint(data)
+        print(data)
 
 
 if __name__ == "__main__":
