@@ -43,12 +43,12 @@ class AnalayzData:
             )
 
             for index, row in merged_df.iterrows():
-                version1 = row["version_df1"]
-                release1 = row["release_df1"]
-                epoch1 = row["epoch_df1"]
-                version2 = row["version_df2"]
-                release2 = row["release_df2"]
-                epoch2 = row["epoch_df2"]
+                version1 = str(row["version_df1"])
+                release1 = str(row["release_df1"])
+                epoch1 = str(row["epoch_df1"])
+                version2 = str(row["version_df2"])
+                release2 = str(row["release_df2"])
+                epoch2 = str(row["epoch_df2"])
                 comparison_result = _compare_rpm_labels(
                     (epoch1, version1, release1), (epoch2, version2, release2)
                 )

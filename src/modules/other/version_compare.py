@@ -61,10 +61,10 @@ except ImportError:
     def _compare_rpm_labels(lhs, rhs):
         lhs_epoch, lhs_version, lhs_release = lhs
         rhs_epoch, rhs_version, rhs_release = rhs
-        result = _compare_rpm_field(str(lhs_epoch), str(rhs_epoch))
+        result = _compare_rpm_field(lhs_epoch, rhs_epoch)
         if result:
             return result
-        result = _compare_rpm_field(str(lhs_version), str(rhs_version))
+        result = _compare_rpm_field(lhs_version, rhs_version)
         if result:
             return result
-        return _compare_rpm_field(str(lhs_release), str(rhs_release))
+        return _compare_rpm_field(lhs_release, rhs_release)
