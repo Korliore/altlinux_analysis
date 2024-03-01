@@ -30,7 +30,7 @@ class AnalayzData:
 
     def version_release_check(self, first_df, second_df):
         """Получить пакеты, где версии в first_df больше second_df"""
-        new_versions = []  # список для хранения строк, удовлетворяющих условию
+        new_versions = []
 
         unique_architectures = first_df["arch"].unique()
 
@@ -53,9 +53,7 @@ class AnalayzData:
                     (epoch1, version1, release1), (epoch2, version2, release2)
                 )
                 if comparison_result == 1:
-                    new_versions.append(
-                        row.to_dict()
-                    )  # Преобразуем строку в словарь и добавляем в список
+                    new_versions.append(row.to_dict())
 
         unique_df = pd.DataFrame(new_versions)  # Создаем DataFrame из списка словарей
         return unique_df

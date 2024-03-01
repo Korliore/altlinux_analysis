@@ -6,10 +6,10 @@ from modules.logger import logger
 
 
 async def main(branch_name_1, branch_name_2, save_on_file):
-    logger.info(f"Скачиваю данные для веток {branch_name_1} и {branch_name_2}")
+    logger.info(f"Downloading data for branches {branch_name_1} and {branch_name_2}")
     api = AltLinuxAPI()
     data = await api.export_branch_binary_packages(branch_name_1, branch_name_2)
-    logger.info("Идёт анализ данных")
+    logger.info("The data analysis process is underway")
     # анализ всех данных
     analayz = AnalayzData(
         data[branch_name_1]["packages"], data[branch_name_2]["packages"]
@@ -26,12 +26,12 @@ async def main(branch_name_1, branch_name_2, save_on_file):
     version_new = analayz.version_release_check(
         analayz.first_branch_df, analayz.second_branch_df
     )
-    logger.info("Формирую Json")
+    logger.info("JSON is being generated")
     data = ShowData(branch_name_1, branch_name_2).show(
         first_uniq, second_uniq, version_new
     )
     if save_on_file:
-        logger.info(f"Идёт запись данных в {save_on_file}")
+        logger.info(f"Data is being recorded in {save_on_file}")
         with open(save_on_file, "w") as f:
             f.write(data)
     else:
@@ -41,7 +41,7 @@ async def main(branch_name_1, branch_name_2, save_on_file):
 if __name__ == "__main__":
     # Получение всех аргументов командной строки
     if len(sys.argv) < 2:
-        raise Exception("Запусайте скрипт через ./get_stat.sh")
+        raise Exception("Run the script via ./get_stat.sh")
     arguments = sys.argv
     branch_name_1 = arguments[1]
     branch_name_2 = arguments[2]
