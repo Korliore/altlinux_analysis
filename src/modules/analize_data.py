@@ -16,15 +16,16 @@ class AnalayzData:
     def get_uniq_packages(self, first_df, second_df):
         """Получить уникальные пакеты"""
         unique_architectures = first_df["arch"].unique()
-        missing_packages_by_arch = {}
+        unique_packages_by_arch = {}
         for arch in unique_architectures:
             # фильтр по архитектуре
             df1_arch = first_df[first_df["arch"] == arch]
             df2_arch = second_df[second_df["arch"] == arch]
             # поиск уникальных значений
-            missing_packages = df1_arch[~df1_arch["name"].isin(df2_arch["name"])]
-            missing_packages_by_arch[arch] = missing_packages
-        return missing_packages_by_arch
+            unique_packages = df1_arch[~df1_arch["name"].isin(df2_arch["name"])]
+            unique_packages_by_arch[arch] = unique_packages
+        unique_df = pd.concat(unique_packages_by_arch.values(), ignore_index=True)
+        return unique_df
 
     def version_release_check(self, first_df, second_df):
         """Получить пакеты, где версии в first_df больше second_df"""
@@ -52,3 +53,37 @@ class AnalayzData:
                 if comparison_result == 1:
                     new_version[arch] = row
         return new_version
+
+
+class ShowData:
+    def __init__(self, first_branch_name, second_branch_name):
+        self.first_branch_name = first_branch_name
+        self.second_branch_name = second_branch_name
+        self.json_data = {}
+
+    def uniq_to_json(self, first_branch, second_branch, branch_name, branch_name_user):
+        unique_first_branch_list = []
+        grouped = first_branch.groupby("arch")
+        for name, group in grouped:
+            pkg_list = []
+            for index, row in group.iterrows():
+                pkg_info = {
+                    "name": row["name"],
+                    "version": row["version"],
+                    "epoch": row["epoch"],
+                    "release": row["release"],
+                    "arch": row["arch"],
+                    "branch": branch_name_user,
+                }
+                pkg_list.append(pkg_info)
+            unique_first_branch_list.append({"arch": name, "pkg": pkg_list})
+        self.json_data[branch_name] = unique_first_branch_list
+
+    def show(self, first_branch, second_branch):
+        self.uniq_to_json(
+            first_branch, second_branch, "unique_first_branch", self.first_branch_name
+        )
+        self.uniq_to_json(
+            second_branch, first_branch, "unique_second_branch", self.second_branch_name
+        )
+        return self.json_data

@@ -2,6 +2,7 @@ try:
     from rpm import labelCompare as _compare_rpm_labels
 except ImportError:
     import re
+
     # Emulate RPM field comparisons
     #
     # * Search each string for alphabetic fields [a-zA-Z]+ and
@@ -13,11 +14,6 @@ except ImportError:
     #   alphabetic, the numeric field is always considered greater (newer).
     # * In the case where one string runs out of fields, the other is always
     #   considered greater (newer).
-
-    import warnings
-
-    warnings.warn("Failed to import 'rpm', emulating RPM label comparisons")
-
     try:
         from itertools import zip_longest
     except ImportError:
